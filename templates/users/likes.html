@@ -1,0 +1,18 @@
+{% extends 'users/detail.html' %}
+
+{% block user_details %}
+<div>
+    <div>
+        <ul>
+            {% for msg in user.likes %}
+            <li>
+                <a href="/messages/{{ msg.id }}"></a>
+                <a href="/users/{{ msg.user.id }}"><img src="{{ msg.user.image_url }}" alt=""></a>
+                <p>{{ msg.text }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

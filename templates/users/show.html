@@ -18,6 +18,12 @@
             <p>{{ message.text }}</p>
           </div>
         </li>
+        <form method="POST" action="/users/add_like/{{ message.id }}" id="messages-form">
+          <button class="
+            btn 
+            btn-sm 
+            {{'btn-primary' if message.id in user.likes else 'btn-secondary'}}"
+          >
 
       {% endfor %}
 
