@@ -39,17 +39,26 @@ class MessageViewTestCase(TestCase):
     def setUp(self):
         """Create test client, add sample data."""
 
-        User.query.delete()
-        Message.query.delete()
+        db.drop_all()
+        db.create_all()
 
         self.client = app.test_client()
 
-        self.testuser = User.signup(username="testuser",
-                                    email="test@test.com",
-                                    password="testuser",
-                                    image_url=None)
+        u1 = User.signup("user_test_1", 'ut1@gmail.com', '12345', None)
+        u1_id = 500
+        u1.id = u1_id
+
+        u2 = User.signup('user_test_2', 'ut2@gmail.com', '54321', None)
+        u2_id = 600
+        u2.id = u2_id
 
         db.session.commit()
+
+        u1 = User.query.get(u1_id)
+        u2 = User.query.get(u2.id)
+
+        self.u1 = u1
+        self.u2 = u2
 
     def test_add_message(self):
         """Can use add a message?"""
@@ -59,7 +68,7 @@ class MessageViewTestCase(TestCase):
 
         with self.client as c:
             with c.session_transaction() as sess:
-                sess[CURR_USER_KEY] = self.testuser.id
+                sess[CURR_USER_KEY] = self.u1.id
 
             # Now, that session setting is saved, so we can have
             # the rest of ours test
@@ -71,3 +80,30 @@ class MessageViewTestCase(TestCase):
 
             msg = Message.query.one()
             self.assertEqual(msg.text, "Hello")
+            
+
+            
+    def test_delete_message(self):
+        
+        # test_m = Message(text='testing123', user_id=self.u1.id)
+
+        
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1.id
+
+            resp = c.post("/messages/new", data={"text": "Hello"})
+
+            # Make sure it redirects
+            self.assertEqual(resp.status_code, 302)
+
+            msg = Message.query.one()
+            self.assertEqual(msg.text, "Hello")
+
+            self.assertEqual(len(Message.query.all()), 1)
+
+            
+            db.session.delete(msg)
+            db.session.commit()
+            
+            self.assertEqual(len(Message.query.all()), 0)

@@ -168,17 +168,35 @@ class UserModelTestCase(TestCase):
         u3 = User.signup(None, 'TU3@gmail.com', '54321', None)
         u3_id = 3333
         u3.id = u3_id
-        db.session.commit()
+        # exc.Integrity error taken from solution. I don't think this was discussed in the curriculum
+        # ???? Would love some more information ????
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
 
+    def test_invalid_email_signup(self):
+        u3 = User.signup("test_user_bad_email", None, '54321', None)
+        u3_id = 3333
+        u3.id = u3_id
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
         
-
-        u3 = User.query.get(u3_id)
+    def test_unique_username_signup(self):
+        u3 = User.signup("user_test_1", 'TU3@gmail.com', '54321', None)
+        u3_id = 3333
+        u3.id = u3_id
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
+    def test_unique_email_signup(self):
+        u3 = User.signup("user_test_1", self.u1.email, '54321', None)
+        u3_id = 3333
+        u3.id = u3_id
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
         
-        all_users = User.query.all()
-
         # self.assertRaises self.assertNotIn(u3, all_users)
-    
-
+    def test_authentication(self):
+        self.assertTrue(self.u1.authenticate(self.u1.username, '12345'))
+        self.assertFalse(self.u1.authenticate(self.u1.username, '54321'))
 
 # Does User.create fail to create a new user if any of the validations (e.g. uniqueness, non-nullable fields) fail?
     # def test_failed_signup(self):
@@ -191,3 +209,5 @@ class UserModelTestCase(TestCase):
 # Does User.authenticate successfully return a user when given a valid username and password?
 # Does User.authenticate fail to return a user when the username is invalid?
 # Does User.authenticate fail to return a user when the password is invalid?
+
+# is user logged in in the session

@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 toolbar = DebugToolbarExtension(app)
 
@@ -316,6 +316,7 @@ def messages_show(message_id):
     """Show a message."""
 
     msg = Message.query.get(message_id)
+    
     return render_template('messages/show.html', message=msg)
 
 
@@ -345,11 +346,13 @@ def toggle_like(message_id):
 
     if msg in g.user.likes:
 
-        this_like = Likes.query.filter_by(message_id = msg.id).filter_by(user_id = g.user.id).first()
-        db.session.delete(this_like)
+        
+        g.user.likes = [like for like in g.user.likes if like != msg]
+        
         db.session.commit()
 
-    g.user.likes.append(msg)
+    else:
+        g.user.likes.append(msg)
     db.session.commit()
 
     return redirect ('/')
@@ -402,8 +405,9 @@ def homepage():
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
+        likes = [message.id for message in g.user.likes]
 
-        return render_template('home.html', messages=messages)
+        return render_template('home.html', messages=messages, likes=likes)
 
     else:
         return render_template('home-anon.html')

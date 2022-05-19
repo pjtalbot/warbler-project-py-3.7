@@ -61,7 +61,16 @@
               <button class="
                 btn 
                 btn-sm 
-                {{'btn-danger' if msg.id in g.user.likes else 'btn-secondary'}}"
+                {{'btn-primary' if msg.id in g.user.likes.message_id else 'btn-danger'}}"
+              >
+                <i class="fa fa-thumbs-up"></i> 
+              </button>
+            </form>
+            <form method="POST" action="/users/add_like/{{ msg.id }}" id="messages-form">
+              <button class="
+                btn 
+                btn-sm 
+                {{'btn-danger' if msg.id in likes else 'btn-secondary'}}"
               >
                 <i class="fa fa-thumbs-up"></i> 
               </button>
