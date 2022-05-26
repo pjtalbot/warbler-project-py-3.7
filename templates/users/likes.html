@@ -5,11 +5,18 @@
     <div>
         <ul>
             {% for msg in user.likes %}
-            <li>
-                <a href="/messages/{{ msg.id }}"></a>
-                <a href="/users/{{ msg.user.id }}"><img src="{{ msg.user.image_url }}" alt=""></a>
-                <p>{{ msg.text }}</p>
-            </li>
+            <li class="list-group-item">
+                <a href="/messages/{{ msg.id  }}" class="message-link"/>
+                <a href="/users/{{ msg.user.id }}">
+                  <img src="{{ msg.user.image_url }}" alt="" class="timeline-image">
+                </a>
+                <div class="message-area">
+                  <a href="/users/{{ msg.user.id }}">@{{ msg.user.username }}</a>
+                  <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
+                  <p>{{ msg.text }}</p>
+                </div>
+                
+              </li>
             {% endfor %}
         </ul>
     </div>

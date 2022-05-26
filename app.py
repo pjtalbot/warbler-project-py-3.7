@@ -163,6 +163,8 @@ def users_show(user_id):
                 .limit(100)
                 .all())
     likes = [message.id for message in user.likes]
+    # if user.id == g.user.id:
+    #     user
     return render_template('users/show.html', user=user, messages=messages, likes=likes)
 
 
@@ -199,6 +201,19 @@ def users_likes(user_id):
 
     user = User.query.get_or_404(user_id)
     return render_template('users/likes.html', user=user)
+
+@app.route('/explore')
+def explore():
+
+    user = g.user
+
+    messages = (Message
+                    .query
+                    .order_by(Message.timestamp.desc())
+                    .limit(100)
+                    .all())
+
+    return render_template('explore.html', user=user, messages=messages)
 
 
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
